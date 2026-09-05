@@ -128,6 +128,11 @@ public class MainActivity extends Activity {
     }
 
     private void showSettingsDialog() {
+        TextView homeUrlLabel = new TextView(this);
+        homeUrlLabel.setText("首页启动地址");
+        homeUrlLabel.setTextSize(18f);
+        homeUrlLabel.setTextColor(Color.WHITE);
+
         EditText homeUrl = new EditText(this);
         homeUrl.setSingleLine(true);
         homeUrl.setTextSize(18f);
@@ -144,6 +149,7 @@ public class MainActivity extends Activity {
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(24, 8, 24, 8);
+        container.addView(homeUrlLabel);
         container.addView(homeUrl);
         container.addView(autoStart);
 
