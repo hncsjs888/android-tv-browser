@@ -22,7 +22,7 @@ import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
     private static final String HOME_URL =
-            "http://212.64.0.247:5178/screen/hanging-output?lang=zh-CN";
+            "http://192.168.110.31:5178/screen/hanging-output?lang=zh-CN";
 
     private WebView webView;
     private long lastRightKeyUp;
