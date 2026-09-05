@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.text.InputType;
+import android.view.inputmethod.InputMethodManager;
 
 import org.mozilla.geckoview.GeckoRuntime;
 import org.mozilla.geckoview.GeckoRuntimeSettings;
@@ -35,6 +36,7 @@ public class MainActivity extends Activity {
     private static GeckoRuntime runtime;
     private GeckoSession session;
     private TextView loadingView;
+    private AlertDialog settingsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         hideSystemUi();
+        ensureAutoStartDefault();
 
         FrameLayout root = new FrameLayout(this);
         GeckoView geckoView = new GeckoView(this);
@@ -103,6 +106,9 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (settingsDialog != null && settingsDialog.isShowing()) {
+            return super.dispatchKeyEvent(event);
+        }
         if (event.getAction() == KeyEvent.ACTION_UP) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT
                     || event.getKeyCode() == KeyEvent.KEYCODE_MENU
@@ -142,6 +148,9 @@ public class MainActivity extends Activity {
         homeUrl.setHintTextColor(Color.GRAY);
         homeUrl.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         homeUrl.setText(getHomeUrl());
+        homeUrl.setSelectAllOnFocus(true);
+        homeUrl.setFocusable(true);
+        homeUrl.setFocusableInTouchMode(true);
 
         CheckBox autoStart = new CheckBox(this);
         autoStart.setText("开机自动启动看板");
@@ -157,9 +166,10 @@ public class MainActivity extends Activity {
         container.addView(homeUrl);
         container.addView(autoStart);
 
-        new AlertDialog.Builder(this)
+        settingsDialog = new AlertDialog.Builder(this)
                 .setTitle("设置")
                 .setView(container)
+                .setNeutralButton("清空", null)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", (dialog, which) -> {
                     String url = homeUrl.getText().toString().trim();
@@ -172,7 +182,23 @@ public class MainActivity extends Activity {
                         session.loadUri(url);
                     }
                 })
-                .show();
+                .create();
+        settingsDialog.setOnShowListener(dialog -> {
+            settingsDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(view -> {
+                homeUrl.setText("");
+                homeUrl.requestFocus();
+            });
+            settingsDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(view ->
+                    settingsDialog.dismiss());
+            homeUrl.requestFocus();
+            homeUrl.selectAll();
+            InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (manager != null) {
+                manager.showSoftInput(homeUrl, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+        settingsDialog.setOnDismissListener(dialog -> settingsDialog = null);
+        settingsDialog.show();
     }
 
     private SharedPreferences getPreferences() {
@@ -181,6 +207,12 @@ public class MainActivity extends Activity {
 
     private String getHomeUrl() {
         return getPreferences().getString(HOME_URL_SETTING, DEFAULT_HOME_URL);
+    }
+
+    private void ensureAutoStartDefault() {
+        if (!getPreferences().contains(AUTO_START)) {
+            setAutoStart(true);
+        }
     }
 
     private void setAutoStart(boolean enabled) {
