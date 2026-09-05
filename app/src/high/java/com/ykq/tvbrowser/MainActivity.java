@@ -132,18 +132,21 @@ public class MainActivity extends Activity {
         TextView homeUrlLabel = new TextView(this);
         homeUrlLabel.setText("首页启动地址");
         homeUrlLabel.setTextSize(18f);
-        homeUrlLabel.setTextColor(Color.WHITE);
+        homeUrlLabel.setTextColor(Color.BLACK);
 
         EditText homeUrl = new EditText(this);
         homeUrl.setSingleLine(true);
         homeUrl.setTextSize(18f);
         homeUrl.setHint("首页地址 http://...");
+        homeUrl.setTextColor(Color.BLACK);
+        homeUrl.setHintTextColor(Color.GRAY);
         homeUrl.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         homeUrl.setText(getHomeUrl());
 
         CheckBox autoStart = new CheckBox(this);
         autoStart.setText("开机自动启动看板");
         autoStart.setTextSize(22f);
+        autoStart.setTextColor(Color.BLACK);
         autoStart.setPadding(16, 16, 16, 16);
         autoStart.setChecked(getPreferences().getBoolean(AUTO_START, true));
 
