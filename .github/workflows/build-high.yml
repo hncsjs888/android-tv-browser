@@ -1,0 +1,40 @@
+name: Build High Version Android TV APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle.properties'
+      - '.github/workflows/build-high.yml'
+
+jobs:
+  build-high:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build arm64-v8a high version APK
+        run: gradle --no-daemon :app:assembleHighDebug
+
+      - name: Upload high version APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tv-browser-arm64-v8a-high-debug
+          path: app/build/outputs/apk/high/debug/*.apk
+          if-no-files-found: error

@@ -15,3 +15,11 @@
 `tv-browser-armeabi-v7a-debug`
 
 APK 架构为 `armeabi-v7a`，适合 32 位 ARM 盒子。应用最低支持 Android 5.0（API 21）。
+
+## 海信高版本构建
+
+在 Actions 中运行 `Build High Version Android TV APK`，下载 `tv-browser-arm64-v8a-high-debug`。
+
+高版本 APK 使用 `arm64-v8a`，最低支持 Android 8.0（API 26），应用包名为 `com.ykq.tvbrowser.high`，可以和低版本 APK 共存。
+
+该 APK 适用于 Android TV 或 Google TV 海信电视，不适用于 VIDAA、Roku 等非 Android 系统。
