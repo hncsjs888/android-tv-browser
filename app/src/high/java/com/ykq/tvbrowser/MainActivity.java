@@ -123,6 +123,7 @@ public class MainActivity extends Activity {
                 .setTitle("退出看板")
                 .setMessage("确定退出看板吗？")
                 .setNegativeButton("取消", null)
+                .setNeutralButton("设置", (dialog, which) -> showSettingsDialog())
                 .setPositiveButton("退出", (dialog, which) -> finish())
                 .show();
     }
