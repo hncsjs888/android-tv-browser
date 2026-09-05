@@ -28,7 +28,18 @@ jobs:
           gradle-version: '8.7'
 
       - name: Build GeckoView armeabi-v7a APK
-        run: gradle --no-daemon :app:assembleLegacyDebug
+        shell: bash
+        run: |
+          set +e
+          gradle --no-daemon --info --stacktrace :app:assembleLegacyDebug 2>&1 | tee build.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            echo "::error::Gradle build failed; last output follows"
+            tail -n 160 build.log | while IFS= read -r line; do
+              echo "::error::${line}"
+            done
+          fi
+          exit "$status"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
