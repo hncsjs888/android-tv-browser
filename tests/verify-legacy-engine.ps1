@@ -5,7 +5,7 @@ $buildFile = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'app/build.gradle'
 $workflow = Get-Content -Raw -Encoding UTF8 (Join-Path $root '.github/workflows/build.yml')
 $activityPath = Join-Path $root 'app/src/legacy/java/com/ykq/tvbrowser/MainActivity.java'
 $manifestPath = Join-Path $root 'app/src/main/AndroidManifest.xml'
-$bootReceiverPath = Join-Path $root 'app/src/legacy/java/com/ykq/tvbrowser/BootReceiver.java'
+$bootReceiverPath = Join-Path $root 'app/src/main/java/com/ykq/tvbrowser/BootReceiver.java'
 
 if ($buildFile -notmatch "legacyImplementation\s+'org\.mozilla\.geckoview:geckoview-armeabi-v7a:") {
     throw 'legacy 构建尚未声明 GeckoView armeabi-v7a 依赖'
@@ -22,6 +22,18 @@ if (-not (Test-Path $activityPath)) {
 $activity = Get-Content -Raw -Encoding UTF8 $activityPath
 if ($activity -notmatch 'GeckoView' -or $activity -notmatch 'GeckoSession') {
     throw 'legacy Activity 尚未使用 GeckoView'
+}
+
+if ($activity -notmatch 'KEYCODE_DPAD_RIGHT' -or $activity -notmatch 'KEYCODE_MENU') {
+    throw 'legacy Activity 尚未配置遥控器退出和设置入口'
+}
+
+if ($activity -notmatch 'AlertDialog' -or $activity -notmatch 'AUTO_START') {
+    throw 'legacy Activity 尚未配置退出确认或自启设置'
+}
+
+if ($activity -notmatch 'glMsaaLevel\(0\)' -or $activity -notmatch 'consoleOutput\(false\)') {
+    throw 'legacy GeckoView 尚未启用低配渲染设置'
 }
 
 $manifest = Get-Content -Raw -Encoding UTF8 $manifestPath
