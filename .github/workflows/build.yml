@@ -42,10 +42,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp app/build/outputs/apk/legacy/debug/*.apk tv-browser-armeabi-v7a-geckoview-debug.apk
+          split -b 10M -d -a 2 tv-browser-armeabi-v7a-geckoview-debug.apk tv-browser-gecko.part-
+          sha256sum tv-browser-armeabi-v7a-geckoview-debug.apk > tv-browser-gecko.sha256
           if gh release view legacy-geckoview >/dev/null 2>&1; then
-            gh release upload legacy-geckoview tv-browser-armeabi-v7a-geckoview-debug.apk --clobber
+            gh release upload legacy-geckoview \
+              tv-browser-armeabi-v7a-geckoview-debug.apk \
+              tv-browser-gecko.part-* \
+              tv-browser-gecko.sha256 \
+              --clobber
           else
-            gh release create legacy-geckoview tv-browser-armeabi-v7a-geckoview-debug.apk \
+            gh release create legacy-geckoview \
+              tv-browser-armeabi-v7a-geckoview-debug.apk \
+              tv-browser-gecko.part-* \
+              tv-browser-gecko.sha256 \
               --title "玩客云 GeckoView 测试版" \
               --notes "面向 Android 5.0+、32 位 ARM 设备的内置 GeckoView 版本。"
           fi
