@@ -2,7 +2,7 @@
 
 启动后全屏打开固定首页：
 
-`http://192.168.110.31:5178/screen/hanging-output?lang=zh-CN`
+`http://212.64.0.247:5178/screen/hanging-output?lang=zh-CN`
 
 ## GitHub Actions 构建
 

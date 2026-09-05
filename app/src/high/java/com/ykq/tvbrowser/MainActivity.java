@@ -18,15 +18,17 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.text.InputType;
 
 public class MainActivity extends Activity {
-    private static final String HOME_URL =
-            "http://192.168.110.31:5178/screen/hanging-output?lang=zh-CN";
+    private static final String DEFAULT_HOME_URL =
+            "http://212.64.0.247:5178/screen/hanging-output?lang=zh-CN";
     private WebView webView;
-    private long lastRightKeyUp;
     private static final String SETTINGS_NAME = "tvbrowser_settings";
     private static final String AUTO_START = "auto_start";
+    private static final String HOME_URL_SETTING = "home_url";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +68,7 @@ public class MainActivity extends Activity {
         });
         webView.setWebChromeClient(new WebChromeClient());
         setContentView(webView);
-        webView.loadUrl(HOME_URL);
+        webView.loadUrl(getHomeUrl());
     }
 
     private void hideSystemUi() {
@@ -81,24 +83,14 @@ public class MainActivity extends Activity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_UP) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                long now = System.currentTimeMillis();
-                if (now - lastRightKeyUp <= 750L) {
-                    lastRightKeyUp = 0L;
-                    showExitDialog();
-                } else {
-                    lastRightKeyUp = now;
-                }
-                return true;
-            }
-            if (event.getKeyCode() == KeyEvent.KEYCODE_MENU
+            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT
+                    || event.getKeyCode() == KeyEvent.KEYCODE_MENU
                     || event.getKeyCode() == KeyEvent.KEYCODE_SETTINGS) {
                 showSettingsDialog();
                 return true;
             }
-            if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && webView != null
-                    && webView.canGoBack()) {
-                webView.goBack();
+            if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                showExitDialog();
                 return true;
             }
         }
@@ -112,6 +104,13 @@ public class MainActivity extends Activity {
     }
 
     private void showSettingsDialog() {
+        EditText homeUrl = new EditText(this);
+        homeUrl.setSingleLine(true);
+        homeUrl.setTextSize(18f);
+        homeUrl.setHint("http://...");
+        homeUrl.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        homeUrl.setText(getHomeUrl());
+
         CheckBox autoStart = new CheckBox(this);
         autoStart.setText("开机自动启动看板");
         autoStart.setTextSize(22f);
@@ -120,15 +119,30 @@ public class MainActivity extends Activity {
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(24, 8, 24, 8);
+        container.addView(homeUrl);
         container.addView(autoStart);
         new AlertDialog.Builder(this).setTitle("设置").setView(container)
                 .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (dialog, which) -> setAutoStart(autoStart.isChecked()))
+                .setPositiveButton("保存", (dialog, which) -> {
+                    String url = homeUrl.getText().toString().trim();
+                    if (url.length() == 0) {
+                        url = DEFAULT_HOME_URL;
+                    }
+                    getPreferences().edit().putString(HOME_URL_SETTING, url).apply();
+                    setAutoStart(autoStart.isChecked());
+                    if (webView != null) {
+                        webView.loadUrl(url);
+                    }
+                })
                 .show();
     }
 
     private SharedPreferences getPreferences() {
         return getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE);
+    }
+
+    private String getHomeUrl() {
+        return getPreferences().getString(HOME_URL_SETTING, DEFAULT_HOME_URL);
     }
 
     private void setAutoStart(boolean enabled) {
