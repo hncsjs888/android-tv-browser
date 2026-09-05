@@ -12,9 +12,9 @@
 
 构建完成后，在任务页面的 `Artifacts` 下载：
 
-`tv-browser-armeabi-v7a-debug`
+`tv-browser-armeabi-v7a-geckoview-debug`
 
-APK 架构为 `armeabi-v7a`，适合 32 位 ARM 盒子。应用最低支持 Android 5.0（API 21）。
+APK 架构为 `armeabi-v7a`，适合 32 位 ARM 盒子。应用最低支持 Android 5.0（API 21）。该版本内置 GeckoView 128，不依赖盒子自带的旧 WebView。
 
 ## 海信高版本构建
 

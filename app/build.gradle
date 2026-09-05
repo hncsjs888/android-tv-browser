@@ -12,15 +12,26 @@ android {
         targetSdk 28
         versionCode 1
         versionName '1.0.0'
+    }
 
-        ndk {
-            abiFilters 'armeabi-v7a'
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     flavorDimensions += 'device'
 
     productFlavors {
+        legacy {
+            dimension 'device'
+            minSdk 21
+            targetSdk 28
+            versionNameSuffix '-legacy-gecko'
+            ndk {
+                abiFilters 'armeabi-v7a'
+            }
+        }
+
         high {
             dimension 'device'
             applicationIdSuffix '.high'
@@ -39,4 +50,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+dependencies {
+    legacyImplementation 'org.mozilla.geckoview:geckoview-armeabi-v7a:128.0.20240704121409'
 }

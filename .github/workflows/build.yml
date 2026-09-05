@@ -24,12 +24,12 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Build armeabi-v7a APK
-        run: gradle --no-daemon :app:assembleDebug
+      - name: Build GeckoView armeabi-v7a APK
+        run: gradle --no-daemon :app:assembleLegacyDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: tv-browser-armeabi-v7a-debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: tv-browser-armeabi-v7a-geckoview-debug
+          path: app/build/outputs/apk/legacy/debug/*.apk
           if-no-files-found: error
