@@ -46,7 +46,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: arm64-geckoview
-          name: N1 ARM64 小体积看板版本
-          body: 兼容 Android 7.1/API 25，使用系统 WebView，支持设置首页地址。
+          name: N1 ARM64 GeckoView 看板版本
+          body: 兼容 Android 7.1/API 25，使用 GeckoView，支持现代网页和设置首页地址。
           files: app/build/outputs/apk/high/debug/*.apk
           make_latest: false
