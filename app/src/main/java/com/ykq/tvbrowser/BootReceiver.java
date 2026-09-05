@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 
 public class BootReceiver extends BroadcastReceiver {
@@ -12,10 +14,32 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+        String action = intent.getAction();
+        if (!Intent.ACTION_BOOT_COMPLETED.equals(action)
+                && !Intent.ACTION_LOCKED_BOOT_COMPLETED.equals(action)) {
             return;
         }
 
+        Context appContext = context.getApplicationContext();
+        new Handler(Looper.getMainLooper()).postDelayed(
+                () -> launchMainActivity(appContext), START_DELAY_MILLIS);
+
+        scheduleFallback(appContext);
+    }
+
+    private static void launchMainActivity(Context context) {
+        Intent launchIntent = new Intent();
+        launchIntent.setClassName(context, context.getPackageName() + ".MainActivity");
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        try {
+            context.startActivity(launchIntent);
+        } catch (RuntimeException ignored) {
+        }
+    }
+
+    private static void scheduleFallback(Context context) {
         Intent launchIntent = new Intent();
         launchIntent.setClassName(context, context.getPackageName() + ".MainActivity");
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
