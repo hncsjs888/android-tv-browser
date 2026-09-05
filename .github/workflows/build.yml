@@ -31,4 +31,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tv-browser-armeabi-v7a-debug
-          path: app/build/outputs/apk/debug/app-armeabi-v7a-debug.apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
