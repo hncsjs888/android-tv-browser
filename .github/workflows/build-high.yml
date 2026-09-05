@@ -10,6 +10,9 @@ on:
       - 'gradle.properties'
       - '.github/workflows/build-high.yml'
 
+permissions:
+  contents: write
+
 jobs:
   build-high:
     runs-on: ubuntu-latest
@@ -38,3 +41,16 @@ jobs:
           name: tv-browser-arm64-v8a-high-debug
           path: app/build/outputs/apk/high/debug/*.apk
           if-no-files-found: error
+
+      - name: Publish high version APK to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/high/debug/*.apk tv-browser-arm64-v8a-high-debug.apk
+          if gh release view arm64-geckoview >/dev/null 2>&1; then
+            gh release upload arm64-geckoview tv-browser-arm64-v8a-high-debug.apk --clobber
+          else
+            gh release create arm64-geckoview tv-browser-arm64-v8a-high-debug.apk \
+              --title "N1 ARM64 GeckoView 版本" \
+              --notes "兼容 Android 7.1/API 25 的 ARM64 版本。"
+          fi
